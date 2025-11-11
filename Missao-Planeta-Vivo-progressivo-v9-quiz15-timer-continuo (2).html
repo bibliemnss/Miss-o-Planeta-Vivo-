@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Missao Planeta Vivo — Edição Solos (Kids) • V3.4</title>
+<meta name="theme-color" content="#16a34a" />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#dcfce7; --bg2:#4ade80; --ink:#0b132b; --muted:#475569; --card:#ffffff; --line:#e2e8f0; --shadow:0 12px 28px rgba(0,0,0,.18);
+    --accent:#16a34a; --accent2:#06b6d4; --good:#16a34a; --bad:#ef4444; --ring:#22d3ee; --panel:#f8fafc;
+    --bin-plastic:#ef4444; --bin-paper:#2563eb; --bin-metal:#facc15; --bin-glass:#22c55e; --bin-organic:#5b3312;
+  }
+  .dark{ --bg1:#0b1220; --bg2:#052e16; --ink:#e5e7eb; --muted:#94a3b8; --card:#0b1226; --line:#1f2937; --shadow:0 12px 28px rgba(0,0,0,.55); --panel:#0b1226; }
+  .hc{ --bg1:#000; --bg2:#000; --ink:#fff; --muted:#e5e5e5; --card:#000; --line:#fff; --panel:#000; --accent:#ff0; --accent2:#0ff; --ring:#0ff; }
+  *{ box-sizing:border-box } html,body{ height:100% }
+  body{ margin:0; font-family:"Nunito", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--ink);
+        background: radial-gradient(1000px 600px at 10% 10%, var(--bg1), var(--bg2)); min-height:100svh; overflow-x:hidden; -webkit-tap-highlight-color: transparent; }
+  .topbar{ position:sticky; top:0; z-index:50; backdrop-filter:saturate(140%) blur(10px);
+           background:linear-gradient(90deg,rgba(255,255,255,.6), rgba(255,255,255,.3)); border-bottom:1px solid var(--line); padding:10px 14px; }
+  .dark .topbar, .hc .topbar{ background:linear-gradient(90deg,rgba(0,0,0,.6), rgba(0,0,0,.3)) }
+  .topbar .inner{ max-width:1200px; margin:0 auto; display:flex; align-items:center; gap:12px; justify-content:space-between }
+  .brand{ display:flex; align-items:center; gap:10px; font-weight:900 }
+  .logo{ width:42px; height:42px; border-radius:12px; display:grid; place-items:center; background: conic-gradient(from 210deg, #22d3ee, #16a34a, #22c55e, #22d3ee);
+         color:white; box-shadow:inset 0 0 0 2px rgba(255,255,255,.5) }
+  .actions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+  .chip{ border:2px solid var(--line); background:var(--card); padding:8px 12px; border-radius:999px; font-weight:900; cursor:pointer }
+  .chip:focus-visible{ outline:4px solid var(--ring) } .chip.active{ box-shadow:0 0 0 4px rgba(34,211,238,.25); border-color:var(--ring) }
+  #app{ max-width:1100px; margin:18px auto; padding:0 16px 24px; position:relative; z-index:1 }
+  .panel{ background:var(--card); border-radius:22px; padding:16px; border:2px solid rgba(0,0,0,.05); box-shadow:var(--shadow) }
+  .hud{ display:grid; grid-template-columns: auto 1fr auto; gap:12px; align-items:center; margin:12px 0; }
+  .badges{ display:flex; gap:8px; flex-wrap:wrap }
+  .badge{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:14px; background:var(--panel);
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 6px 18px rgba(0,0,0,.12); font-weight:900; border:1px solid var(--line) }
+  .controls{ display:flex; gap:8px; flex-wrap:wrap; justify-self:end }
+  .btn{ appearance:none; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+        padding:12px 16px; border-radius:16px; font-weight:900; background:linear-gradient(135deg,var(--accent),#4ade80); color:#fff; box-shadow:0 10px 24px rgba(0,0,0,.2); transition:transform .05s ease, box-shadow .2s ease }
+  .btn:hover{ transform: translateY(-1px) } .btn:active{ transform: translateY(1px) }
+  .btn.ghost{ background:var(--card); color:var(--ink); border:2px dashed var(--line) } .btn.icon{ padding:10px 12px; background:var(--panel); color:var(--ink) }
+  .grid{ display:grid; gap:12px } .cols-2{ grid-template-columns:repeat(2,minmax(0,1fr)) }
+  @media (max-width:860px){ .hud{ grid-template-columns: 1fr } .controls{ justify-self:start } .cols-2{ grid-template-columns:1fr } }
+  .title{ margin:4px 0 10px; font-size:1rem; font-weight:900; color:var(--ink) } .tiny{ font-size:.85rem; color:var(--muted) }
+  #fx{ position:fixed; inset:0; pointer-events:none }
+  .ring{ width:64px; height:64px; border-radius:50%; display:grid; place-items:center; font-weight:900; color:#fff; }
+  .ring > span{ font-size:.8rem; color:var(--ink); font-weight:900 }
+  .card{ background:var(--panel); border-radius:18px; padding:12px; border:1px solid var(--line); box-shadow:inset 0 1px 0 #fff2, 0 8px 18px rgba(0,0,0,.08) }
+  .playground{ display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start }
+  .trash-item{ user-select:none; cursor:grab; padding:10px 12px; border-radius:14px; background:#ffffff; border:2px solid var(--line);
+    display:inline-flex; align-items:center; gap:10px; font-weight:900; box-shadow:0 6px 16px rgba(0,0,0,.12); transition:transform .15s ease }
+  .trash-item:active{ cursor:grabbing; transform:scale(.98) } .trash-item.selected{ outline:4px solid var(--ring) }
+  .pile{ display:flex; gap:8px; flex-wrap:wrap }
+  .bin{ flex:1 1 220px; min-height:160px; padding:12px; border-radius:18px; border:2px solid rgba(0,0,0,.08); color:white; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:900; box-shadow:0 6px 18px rgba(0,0,0,.25); transition:transform .1s ease; }
+  .bin .bicon{ width:48px; height:48px; margin-bottom:6px } .bin h4{ margin:0 0 6px; font-size:1rem; }
+  .bin.ok{ outline:3px solid #34d399 } .bin.wrong{ outline:3px solid var(--bad) }
+  .bin.plastico{ background:var(--bin-plastic) } .bin.papel{ background:var(--bin-paper) } .bin.metal{ background:var(--bin-metal); color:#111 }
+  .bin.vidro{ background:var(--bin-glass) } .bin.organico{ background:var(--bin-organic) }
+  .q{ display:flex; flex-direction:column; gap:12px; border-radius:16px; padding:16px; background:var(--card); border:1px solid var(--line) }
+  .choices{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px }
+  .choice{ padding:14px 16px; border:2px solid var(--line); border-radius:14px; font-weight:900; cursor:pointer }   .error-box{ margin-top:12px; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:rgba(248,113,113,0.08) } .error-box-title{ font-weight:700; margin-bottom:4px } .error-box-text{ font-size:0.85rem; margin-bottom:8px } .error-box-btn{ padding:6px 12px; border-radius:999px; border:1px solid var(--line); background:#fff; cursor:pointer; font-size:0.85rem }
+  .choice.y{ background:linear-gradient(135deg,#16a34a,#86efac); color:#052e16 } .choice.n{ background:linear-gradient(135deg,#ef4444,#fca5a5); color:#450a0a }
+  .map-wrap{ display:grid; grid-template-columns: 2fr 1fr; gap:12px }
+  @media (max-width:900px){ .map-wrap{ grid-template-columns: 1fr } }
+  .map{ position:relative; border-radius:18px; border:2px solid #dbeafe; padding:8px; display:grid; grid-template-columns: repeat(8, 1fr); gap:4px; background:#e0f2fe; box-shadow:inset 0 2px 0 #fff; }
+  .tile{ aspect-ratio:1/1; border-radius:10px; display:flex; align-items:center; justify-content:center; border:2px solid rgba(0,0,0,.06); background:#fff; position:relative; font-weight:900; color:#111827; overflow:hidden }
+  .tile.ok{ outline:3px solid #34d399 } .tile.wrong{ outline:3px solid var(--bad) }
+  .tile[data-solo="Arenoso"]{ background: linear-gradient(#fde68a,#f59e0b) }
+  .tile[data-solo="Rochoso"]{ background: linear-gradient(#cbd5e1,#64748b) }
+  .tile[data-solo="Argiloso"]{ background: linear-gradient(#fecaca,#f97316) }
+  .tile[data-solo="Humoso"]{ background: linear-gradient(#86efac,#16a34a) }
+  .plot{ aspect-ratio:1/1; border-radius:10px; display:flex; align-items:center; justify-content:center; border:3px dashed rgba(0,0,0,.35); background:rgba(255,255,255,.35); width:86%; height:86%; }
+  .static-plant{ pointer-events:none; display:flex; align-items:center; justify-content:center; font-size:1.2rem; font-weight:900; filter: drop-shadow(0 2px 4px rgba(0,0,0,.2)); user-select:none; width:100%; height:100%; }
+  .plant{ user-select:none; cursor:grab; padding:10px 12px; border-radius:12px; background:#fff; border:2px solid var(--line); display:inline-flex; align-items:center; gap:10px; font-weight:900; box-shadow:0 6px 16px rgba(0,0,0,.12) }
+  .plant.selected{ outline:4px solid var(--ring) }
+  #toast{ position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:#111827; color:#fff; border-radius:999px; padding:10px 14px; font-weight:900; box-shadow:0 12px 26px rgba(0,0,0,.35); opacity:0; transition:opacity .25s ease; z-index:60 }
+  /* Tupã minimal: apenas botão flutuante + balão avulso */
+  .tupa-btn{ position: fixed; right: 16px; bottom: 16px; z-index: 55; width:56px; height:56px; border-radius:999px;
+             border:2px solid var(--line); background:var(--card); display:grid; place-items:center; font-size:26px; cursor:pointer; box-shadow:var(--shadow) }
+  .tupa-bubble{ position: fixed; right: 16px; bottom: 84px; z-index: 56; max-width: 420px; background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; box-shadow: var(--shadow); font-weight: 800; display:none }
+  /* Modal "Como jogar" */
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:70 }
+  .modal{ background:var(--card); border:2px solid var(--line); border-radius:18px; padding:18px; width:min(680px,92vw); box-shadow:var(--shadow) }
+  .modal h3{ margin:0 0 8px; font-size:1.15rem }
+  .modal p{ margin:6px 0; font-weight:800; color:var(--ink) }
+  .modal .actions{ display:flex; justify-content:flex-end; margin-top:12px }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">🌍</div>
+        <div>
+          <div style="font-weight:900">Missao Planeta Vivo</div>
+          <div class="tiny">Edição Solos • V3.4</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="themeBtn" class="chip" title="Alternar tema">🌙 Tema</button>
+        <button id="hcBtn" class="chip" title="Alto contraste">⚡ Alto contraste</button>
+        <button id="muteFxBtn" class="chip" title="FX sonoros">🔈 FX</button>
+        <button id="howToBtn" class="chip" title="Como jogar">ℹ️ Como jogar</button>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <div id="app" role="application" aria-label="Missao Planeta Vivo">
+    <div class="hud" role="toolbar" aria-label="Painel de controle">
+      <div class="badges">
+        <div class="badge">⭐ Pontos: <span id="score">0</span></div>
+        <div class="badge">🎯 Fase: <span id="stageName">Treino</span></div>
+        <div class="badge">⏱️ Tempo: <span id="timer">00:00</span></div>
+        <div class="badge">🏆 Recorde: <span id="best">0</span></div>
+      </div>
+      <div class="ring" id="ring" style="background:conic-gradient(#22c55e 0%, #22c55e 0%, #e5e7eb 0%);"><span id="ringText">0%</span></div>
+      <div class="controls">
+        <button class="btn" id="startBtn">Começar</button>
+        <button class="btn ghost" id="resetBtn">Reiniciar</button>
+        <button class="btn icon" id="pauseBtn" aria-pressed="false" title="Pausar/Retomar">⏸️</button>
+      </div>
+    </div>
+
+    <div id="view" class="panel">
+      <div class="card">
+        <div class="title">🌩️ Tupã — Guardião do Céu e da Terra</div>
+        <p style="font-weight:800; font-size:1.05rem; line-height:1.35">
+          “Ouvi o chamado do planeta… 🌍<br>
+          E escolhi você, pequeno guardião!<br>
+          Vamos limpar, aprender e plantar para devolver a vida à Terra.”
+        </p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <button class="btn" id="startIntro">Começar Missão</button>
+          <button class="btn ghost" id="howToIntro">Como jogar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite">Toast</div>
+
+  <!-- Tupã minimal -->
+  <button class="tupa-btn" id="tupaBtn" title="Tupã">⚡</button>
+  <div class="tupa-bubble" id="tupaBubble" role="status" aria-live="polite"></div>
+
+  <!-- Modal "Como jogar" -->
+  <div class="modal-backdrop" id="howtoBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="howtoTitle">
+      <h3 id="howtoTitle">Como jogar</h3>
+      <div id="howtoContent" class="tiny"></div>
+      <div class="actions">
+        <button class="btn" id="howtoOk">Entendi! Vamos jogar 🚀</button>
+      </div>
+    
+  <!-- Modal de Justificativa (Erros do Quiz) -->
+  <div class="modal-backdrop" id="explainBackdrop" style="display:none">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="explainTitle">
+      <h3 id="explainTitle">Por que está errado?</h3>
+      <div id="explainContent" class="tiny" style="font-weight:900"></div>
+      <div class="actions">
+        <button class="btn" id="explainOk">Entendi, continuar ▶️</button>
+      </div>
+    </div>
+  </div>
+</div>
+  </div>
+
+<script>
+"use strict";
+/* ===== Utils & State ===== */
+const $=s=>document.querySelector(s);
+const ring=$('#ring'), ringText=$('#ringText'), view=$('#view'), scoreEl=$('#score'), timerEl=$('#timer'), stageNameEl=$('#stageName'), bestEl=$('#best'), toastEl=$('#toast');
+let score=0, stage=0, timerInt, startTime=0, paused=false;
+let fxMuted=false;
+let dragging=null;
+bestEl.textContent = localStorage.missaoRecord || 0;
+
+function ringSet(p){ const pct=Math.max(0,Math.min(100,p|0)); ring.style.background=`conic-gradient(#22c55e ${pct}%, #e5e7eb ${pct}%)`; ringText.textContent=pct+'%'; }
+function setStage(name){ stageNameEl.textContent=name; ringSet(name==='Fase 1'?33 : name==='Fase 2'?66 : name==='Fase 3'?90 : 0); }
+function toast(msg, tone='neutral'){ 
+  toastEl.textContent = msg; 
+  toastEl.style.opacity='1'; 
+  toastEl.style.background = tone==='good' ? '#16a34a' : (tone==='bad' ? '#dc2626' : '#111827');
+  toastEl.style.color = '#fff';
+  toastEl.style.boxShadow = '0 12px 26px rgba(0,0,0,.35)';
+  setTimeout(()=>toastEl.style.opacity='0', 1800);
+}
+function startTimer(){ if(timerInt) return; startTime=Date.now(); timerInt=setInterval(()=>{ if(paused) return; const s=Math.floor((Date.now()-startTime)/1000), mm=String(Math.floor(s/60)).padStart(2,'0'), ss=String(s%60).padStart(2,'0'); timerEl.textContent=`${mm}:${ss}`; },250) }
+function addScore(n){ score+=n; scoreEl.textContent=score; if(score>+localStorage.missaoRecord||!localStorage.missaoRecord){ localStorage.missaoRecord=score; bestEl.textContent=score; } }
+function resetGame(){ clearInterval(timerInt); timerInt=null; timerEl.textContent='00:00'; score=0; scoreEl.textContent=0; stage=0; setStage('Treino'); paused=false; renderIntro(); }
+
+/* ===== Theme/HC toggles ===== */
+$('#themeBtn').onclick=()=>{ document.body.classList.toggle('dark'); };
+$('#hcBtn').onclick=()=>{ document.body.classList.toggle('hc'); };
+/* FX toggle actually changes volume now */
+let _audioMaster=null;
+$('#muteFxBtn').onclick=()=>{
+  fxMuted=!fxMuted; $('#muteFxBtn').classList.toggle('active', fxMuted);
+  try{ if(_audioMaster){ _audioMaster.gain.value = fxMuted?0:0.8; } }catch{}
+};
+
+/* ===== Audio & FX ===== */
+const AudioFX = (()=>{
+  let ctx=null; 
+  const ensure=()=>{
+    if(ctx) return ctx;
+    ctx = new (window.AudioContext||window.webkitAudioContext||function(){})();
+    if(ctx.createGain){
+      _audioMaster = ctx.createGain();
+      _audioMaster.gain.value = fxMuted?0:0.8;
+      _audioMaster.connect(ctx.destination);
+    }
+    return ctx;
+  };
+  function beep(type='sine', f=600, t=.12, v=.2){
+    try{
+      const c=ensure(); if(!c.createOscillator) return;
+      const o=c.createOscillator(), g=c.createGain(); o.type=type; o.frequency.value=f; g.gain.value=v; o.connect(g); g.connect(_audioMaster||c.destination);
+      o.start(); o.stop(c.currentTime+t);
+    }catch(e){}
+  }
+  const ok=()=>{ if(fxMuted) return; beep('triangle',700,.12,.25); setTimeout(()=>beep('triangle',900,.1,.18),80) };
+  const bad=()=>{ if(fxMuted) return; beep('sawtooth',180,.18,.18) };
+  const win=()=>{ if(fxMuted) return; beep('square',700,.12,.28); setTimeout(()=>beep('square',900,.12,.24),120); setTimeout(()=>beep('square',1100,.2,.2),240) };
+  return {ok,bad,win,ensure};
+})();
+
+/* ===== Confetti ===== */
+const FX = (()=>{
+  const c=document.getElementById('fx'); const x=c.getContext ? c.getContext('2d') : null; let W=0,H=0,parts=[];
+  function resize(){ if(!x) return; W=c.width=innerWidth; H=c.height=innerHeight } addEventListener('resize',resize); resize();
+  function burst(n=180){ if(!x) return; for(let i=0;i<n;i++) parts.push({x:W/2,y:H/2,r:4+Math.random()*6,vx:(Math.random()-0.5)*8,vy:(Math.random()-1)*8,a:1,h:Math.floor(Math.random()*360)}); }
+  (function loop(){ if(!x){ requestAnimationFrame(loop); return; } x.clearRect(0,0,W,H);
+    for(const p of parts){ p.x+=p.vx; p.y+=p.vy; p.vy+=0.12; p.a*=0.985; x.fillStyle=`hsla(${p.h} 90% 60% / ${p.a})`; x.beginPath(); x.arc(p.x,p.y,p.r,0,Math.PI*2); x.fill(); }
+    parts=parts.filter(p=>p.a>0.02&&p.y<H+20); requestAnimationFrame(loop); })();
+  return {burst};
+})();
+
+/* ===== Tupã minimal ===== */
+const tupaBtn = $('#tupaBtn');
+const tupaBubble = $('#tupaBubble');
+function tupaSay(text, alsoNarrate=true){
+  tupaBubble.textContent = text;
+  tupaBubble.style.display = 'block';
+  // sem efeito; some sozinho após 3s
+  setTimeout(()=>{ tupaBubble.style.display='none'; }, 3000);
+  if(alsoNarrate) { try{ /* opcional: pode ser ligado no futuro */ }catch(e){} }
+}
+tupaBtn.addEventListener('click', ()=>{
+  if(tupaBubble.style.display==='block'){ tupaBubble.style.display='none'; } else { tupaSay('Vamos nessa missão!'); }
+});
+
+/* ===== Modal "Como jogar" ===== */
+const howtoBackdrop = $('#howtoBackdrop');
+const howtoContent = $('#howtoContent');
+const howtoOk = $('#howtoOk');
+const howtoBtn = $('#howToBtn');
+function openHowTo(text){
+  howtoContent.innerHTML = text;
+  howtoBackdrop.style.display = 'flex';
+}
+function closeHowTo(){
+  howtoBackdrop.style.display = 'none';
+}
+howtoOk.onclick = closeHowTo;
+howtoBackdrop.addEventListener('click', (e)=>{ if(e.target===howtoBackdrop) closeHowTo(); });
+howtoBtn.onclick = ()=>{
+  openHowTo(currentHowToText());
+};
+
+/* ===== Controls ===== */
+function bindGlobalControls(){
+  const start = ()=>{ AudioFX.ensure(); renderDragDrop(); };
+  $('#startBtn').onclick=start;
+  $('#resetBtn').onclick=resetGame;
+  $('#pauseBtn').onclick=()=>{ paused=!paused; $('#pauseBtn').textContent = paused?'▶️':'⏸️'; tupaSay(paused?'Jogo pausado.':'Continuando!', false) };
+  $('#startIntro').onclick=start;
+  $('#howToIntro').onclick=()=> openHowTo(currentHowToText());
+}
+
+/* ===== Phase 1 ===== */
+const TRASH=[
+  {name:'Garrafa PET', type:'Plástico', emoji:'🧴'},
+  {name:'Sacolinha', type:'Plástico', emoji:'🛍️'},
+  {name:'Copo descartável', type:'Plástico', emoji:'🥤'},
+  {name:'Papelão', type:'Papel', emoji:'📦'},
+  {name:'Jornal', type:'Papel', emoji:'📰'},
+  {name:'Caderno', type:'Papel', emoji:'📒'},
+  {name:'Lata', type:'Metal', emoji:'🥫'},
+  {name:'Clips', type:'Metal', emoji:'📎'},
+  {name:'Garrafa de vidro', type:'Vidro', emoji:'🍾'},
+  {name:'Pote de vidro', type:'Vidro', emoji:'🫙'},
+  {name:'Banana', type:'Orgânico', emoji:'🍌'},
+  {name:'Salada', type:'Orgânico', emoji:'🥗'},
+  {name:'Maçã', type:'Orgânico', emoji:'🍎'}
+];
+const BINS=[
+  {label:'Plástico', cls:'plastico', svg:'<svg class="bicon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M7 7h10l-1 13H8L7 7Z"/><path stroke-width="2" d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>'},
+  {label:'Papel', cls:'papel', svg:'<svg class="bicon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M7 3h7l5 5v13H7V3Z"/><path stroke-width="2" d="M14 3v5h5"/></svg>'},
+  {label:'Metal', cls:'metal', svg:'<svg class="bicon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3" stroke-width="2"/><path stroke-width="2" d="M12 2v4m0 12v4M2 12h4m12 0h4M4.9 4.9l2.8 2.8m8.6 8.6 2.8 2.8M4.9 19.1l2.8-2.8m8.6-8.6 2.8-2.8"/></svg>'},
+  {label:'Vidro', cls:'vidro', svg:'<svg class="bicon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M9 2h6v4l-1 2v10a3 3 0 1 1-4 0V8L9 6V2Z"/></svg>'},
+  {label:'Orgânico', cls:'organico', svg:'<svg class="bicon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M12 21c4-2 6-6 6-10 0-4.97-4-8-6-8-2 0-6 3.03-6 8 0 4 2 8 6 10Z"/></svg>'},
+];
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
+let selectedItem=null;
+
+function renderDragDrop(){
+  setStage('Fase 1'); 
+  openHowTo(currentHowToText('Fase 1'));
+  const picks=shuffle([...TRASH]).slice(0,12);
+  const binsHtml=BINS.map(bin=>`
+    <div class="card bin ${bin.cls}" data-type="${bin.label}" ondragover="event.preventDefault()" ondrop="dropOnBin(event)" onclick="tapBin(this)" role="button" tabindex="0" aria-label="Lixeira de ${bin.label}">
+      ${bin.svg}<h4>${bin.label}</h4><div class="pile" data-here="${bin.label}"></div></div>`).join('');
+  const itemsHtml=picks.map((t,i)=>`<div class="trash-item" draggable="true" ondragstart="dragStart(event)" onclick="selectItem(this)" data-type="${t.type}" data-id="t${i}" role="button" tabindex="0">${t.emoji} ${t.name}</div>`).join('');
+  view.innerHTML=`<div class="grid cols-2"><div class="card"><div class="title">Arraste (PC) ou toque → lixeira (celular)</div><div class="playground"><div class="pile" id="pile">${itemsHtml}</div></div></div><div class="grid cols-2">${binsHtml}</div></div>`;
+  startTimer();
+  ringSet(33);
+}
+window.dragStart = (e)=>{ dragging = e.target; e.dataTransfer && e.dataTransfer.setData && e.dataTransfer.setData('text/plain', dragging.dataset.type); AudioFX.ensure(); };
+window.dropOnBin = (e)=>{ e.preventDefault && e.preventDefault(); if(!dragging) return; tryPlaceBin(e.currentTarget, dragging.dataset.type, dragging) };
+window.selectItem = (el)=>{ if(selectedItem) selectedItem.classList.remove('selected'); selectedItem = el; el.classList.add('selected'); };
+window.tapBin = (binEl)=>{ if(!selectedItem) return toast('Selecione um item primeiro'); tryPlaceBin(binEl, selectedItem.dataset.type, selectedItem) };
+function tryPlaceBin(binEl, gotType, itemEl){
+  const want = binEl.dataset.type;
+  if(want===gotType){
+    binEl.querySelector('.pile').appendChild(itemEl); const txt=(itemEl.textContent||'').trim(); const icon=txt.split(' ')[0]||txt; itemEl.textContent=icon;
+    binEl.classList.add('ok'); setTimeout(()=>binEl.classList.remove('ok'),300);
+    itemEl.classList.remove('selected'); selectedItem=null; dragging=null;
+    addScore(10); AudioFX.ok(); toast('Acertou! '+ (itemEl?itemEl.textContent.trim():'Item') +' na lixeira de '+ want +'.');
+    if(document.querySelectorAll('#pile .trash-item').length===0){ setTimeout(renderQuiz, 500); }
+  }else{
+    binEl.classList.add('wrong'); setTimeout(()=>binEl.classList.remove('wrong'),300);
+    AudioFX.bad(); toast('Tente outra lixeira.', 'bad'); tupaSay('Quase! Observe o material e tente de novo.', false);
+  }
+}
+
+/* ===== Fase 2 ===== */
+
+/* ===== Modal de Justificativa (Quiz) ===== */
+const explainBackdrop = document.getElementById('explainBackdrop');
+const explainContent  = document.getElementById('explainContent');
+const explainOk       = document.getElementById('explainOk');
+
+// Mapa de justificativas por pergunta (texto exato do array QUIZ)
+const QUIZ_EXPLAINS = {
+  'Separar o lixo ajuda a reciclar mais e poluir menos.': 'Separar evita contaminação entre materiais, aumenta a taxa de reciclagem e reduz poluição do solo e da água.',
+  'Jogar óleo de cozinha na pia não faz mal.': 'Óleo na pia contamina a água, causa entupimentos e prejudica estações de tratamento. Deve ser armazenado e entregue em pontos de coleta.',
+  'Apagar a luz quando sair do cômodo economiza energia.': 'Luz apagada = menos consumo e menos emissões na geração de energia.',
+  'Plástico demora pouco tempo para se decompor.': 'Plásticos podem levar centenas de anos para se decompor. Por isso, reduzir, reutilizar e reciclar é essencial.',
+  'Reutilizar potes e garrafas é uma forma de reduzir resíduos.': 'Reuso prolonga a vida útil dos objetos e diminui resíduos e demanda por novos materiais.',
+  'Queimadas são uma maneira segura de limpar terrenos.': 'Queimadas liberam poluentes, destroem biodiversidade, empobrecem o solo e oferecem risco de incêndio.',
+  'Economizar água ao escovar os dentes ajuda o planeta.': 'Fechar a torneira reduz desperdício e preserva recursos hídricos.',
+  'Pilha pode ser jogada no lixo comum.': 'Pilhas contêm metais pesados. Devem ir para pontos de coleta específicos para evitar contaminação.',
+  'Compostagem transforma restos de comida em adubo.': 'A compostagem recicla matéria orgânica e produz adubo, fechando o ciclo de nutrientes.',
+  'Vidros devem ser reciclados limpos e sem restos.': 'Vidro limpo evita contaminação de lotes e melhora a qualidade da reciclagem.',
+  'Reciclar é o mesmo que reutilizar.': 'Reciclar transforma materiais em novos produtos; reutilizar é usar o mesmo objeto novamente sem transformação.',
+  'O descarte incorreto de pilhas e baterias polui o solo e a água.': 'Esses resíduos contêm metais pesados que contaminam o ambiente e prejudicam a saúde.',
+  'Podemos jogar restos de comida no lixo reciclável.': 'Restos de comida contaminam materiais recicláveis. Eles devem ir para o lixo orgânico ou para a compostagem.',
+  'Usar transporte coletivo ajuda a reduzir a poluição do ar.': 'Menos carros nas ruas significam menos emissões de gases poluentes e menor consumo de combustível.',
+  'O lixo eletrônico deve ser jogado junto com o lixo comum.': 'Lixo eletrônico contém componentes tóxicos e precisa ser entregue em pontos de coleta especializados.'
+};
+
+function openExplainModal(qText){
+  try{ explainBackdrop.style.display = 'flex'; }catch(e){}
+  try{ const ok = document.getElementById('explainOk'); if(ok){ setTimeout(()=>{ try{ ok.focus(); }catch(e){} }, 60); } }catch(e){}
+  paused = true; // pausa o timer e interações de avanço
+  const msg = QUIZ_EXPLAINS[qText] || 'Revise o conceito ambiental envolvido nesta afirmação.';
+  try{ explainContent.textContent = msg; }catch(e){}
+  try{ explainBackdrop.style.display = 'flex'; }catch(e){}
+}
+function closeExplainModal(){
+  try{ explainBackdrop.style.display = 'none'; }catch(e){}
+  paused = false;
+}
+if(explainBackdrop){
+  explainBackdrop.addEventListener('click', (e)=>{ if(e.target===explainBackdrop){ /* força ler a explicação antes: não fecha ao clicar fora */ } });
+}
+if(explainOk){
+  explainOk.addEventListener('click', ()=>{ closeExplainModal(); });
+}
+
+const QUIZ=[
+  {q:'Separar o lixo ajuda a reciclar mais e poluir menos.', a:true},
+  {q:'Jogar óleo de cozinha na pia não faz mal.', a:false},
+  {q:'Apagar a luz quando sair do cômodo economiza energia.', a:true},
+  {q:'Plástico demora pouco tempo para se decompor.', a:false},
+  {q:'Reutilizar potes e garrafas é uma forma de reduzir resíduos.', a:true},
+  {q:'Queimadas são uma maneira segura de limpar terrenos.', a:false},
+  {q:'Economizar água ao escovar os dentes ajuda o planeta.', a:true},
+  {q:'Pilha pode ser jogada no lixo comum.', a:false},
+  {q:'Compostagem transforma restos de comida em adubo.', a:true},
+  {q:'Vidros devem ser reciclados limpos e sem restos.', a:true},
+  {q:'Reciclar é o mesmo que reutilizar.', a:false},
+  {q:'O descarte incorreto de pilhas e baterias polui o solo e a água.', a:true},
+  {q:'Podemos jogar restos de comida no lixo reciclável.', a:false},
+  {q:'Usar transporte coletivo ajuda a reduzir a poluição do ar.', a:true},
+  {q:'O lixo eletrônico deve ser jogado junto com o lixo comum.', a:false}
+];
+function renderQuiz(){
+  setStage('Fase 2'); 
+  openHowTo(currentHowToText('Fase 2'));
+  let order=shuffle([...QUIZ]); let i=0, right=0;
+  function show(){
+    if(i>=order.length) return endQuiz();
+    const it=order[i];
+    view.innerHTML = `<div class="q" role="group" aria-label="Pergunta ${i+1} de ${order.length}">
+      <div class="title">${i+1}/${order.length}</div>
+      <div style="font-weight:900">${it.q}</div>
+      <div class="choices">
+        <button class="choice y" id="cTrue">✅ Verdadeiro</button>
+        <button class="choice n" id="cFalse">❌ Falso</button>
+      </div>
+    </div>`;
+    $('#cTrue').onclick=()=>pick(true); $('#cFalse').onclick=()=>pick(false);
+    ringSet(33 + Math.floor(i/order.length*33));
+  }
+  function pick(val){
+    const it=order[i]; const good=it.a===val;
+    if(good){
+      addScore(15); right++; AudioFX.ok(); toast('Boa! Isso ajuda o planeta. ✅', 'good'); tupaSay('Acertou, continue!', false);
+      i++; show();
+    } else {
+      AudioFX.bad(); 
+      const expMsg = QUIZ_EXPLAINS[it.q] || 'Revise o conceito ambiental envolvido nesta afirmação.'; 
+      // Caixa de feedback explicando por que está errado
+      const qEl = document.querySelector('.q');
+      if(qEl){
+        let box = qEl.querySelector('.error-box');
+        if(box) box.remove();
+        box = document.createElement('div');
+        box.className = 'error-box';
+        box.innerHTML = `<div class="error-box-title">Resposta incorreta</div>
+<div class="error-box-text">${expMsg}</div>
+<button type="button" class="error-box-btn">Tentar novamente</button>`;
+        qEl.appendChild(box);
+        const btn = box.querySelector('.error-box-btn');
+        if(btn){
+          btn.addEventListener('click', ()=>{
+            box.remove();
+          });
+        }
+      } else {
+        toast(expMsg, 'bad');
+      }
+      tupaSay('Vamos revisar e tentar de novo.', false);
+    }
+  }
+  function endQuiz(){
+    addScore(right*5);
+    view.innerHTML = `<div class="card"><div class="title">Quiz concluído!<\/div><p>Acertos: <b>${right}<\/b> de <b>${order.length}<\/b>. Preparando a Fase 3… 🌱<\/p><\/div>`; tupaSay('Você mandou bem no quiz! Vamos plantar com estratégia.', false);
+    setTimeout(renderPlanting, 800);
+    ringSet(66);
+  }
+  show();
+}
+
+/* ===== Fase 3 ===== */
+/* Terrenos sem rótulos internos; legenda fica abaixo do mapa */
+const SOLOS=['Arenoso','Rochoso','Argiloso','Humoso'];
+const PLANTS=[
+  {name:'Mangueira', soil:'Arenoso', emoji:'🥭'},
+  {name:'Coqueiro', soil:'Arenoso', emoji:'🌴'},
+  {name:'Mandacaru', soil:'Rochoso', emoji:'🌵'},
+  {name:'Aroeira', soil:'Rochoso', emoji:'🌲'},
+  {name:'Bananeira', soil:'Humoso', emoji:'🍌'},
+  {name:'Ingá', soil:'Humoso', emoji:'🌿'},
+  {name:'Ipê-amarelo', soil:'Argiloso', emoji:'🌼'},
+  {name:'Jatobá', soil:'Argiloso', emoji:'🌳'},
+  {name:'Pitanga', soil:'Humoso', emoji:'🍒'},
+  {name:'Melão', soil:'Arenoso', emoji:'🍈'}
+];
+let selectedPlant=null;
+function renderPlanting(){
+  setStage('Fase 3'); 
+  openHowTo(currentHowToText('Fase 3'));
+  const size=8, tiles=[]; function rnd(i){ return Math.abs(Math.sin(i*98765))*1000 % 1; }
+  const plants=shuffle([...PLANTS]).slice(0,10);
+  const plotsNeeded=plants.length;
+  const idxBySoil={Arenoso:[],Rochoso:[],Argiloso:[],Humoso:[]};
+  for(let r=0;r<size;r++){ for(let c=0;c<size;c++){ const idx=r*size+c; const pick=SOLOS[(r+c)%SOLOS.length]; idxBySoil[pick].push(idx); } }
+  const need={Arenoso:0,Rochoso:0,Argiloso:0,Humoso:0}; plants.forEach(p=>need[p.soil]++);
+  const plots=new Set();
+  Object.entries(need).forEach(([soil,count])=>{ const arr=idxBySoil[soil].slice().sort(()=>Math.random()-0.5); for(let i=0;i<count && i<arr.length;i++) plots.add(arr[i]) });
+  let flat=[...idxBySoil.Arenoso,...idxBySoil.Rochoso,...idxBySoil.Argiloso,...idxBySoil.Humoso].sort(()=>Math.random()-0.5);
+  for(let id of flat){ if(plots.size>=plotsNeeded) break; plots.add(id) }
+
+  for(let r=0;r<size;r++){
+    for(let c=0;c<size;c++){
+      const idx=r*size+c, pick=SOLOS[(r+c)%SOLOS.length];
+      let cell = `<div class="tile" data-solo="${pick}" onclick="tapTile(this)" ondragover="event.preventDefault()" ondrop="dropOnTile(event)">`;
+      if(rnd(idx)<0.12){ const e=(pick==='Humoso')?'🌿':(pick==='Arenoso')?'🌴':(pick==='Rochoso')?'🌵':'🌳'; cell+=`<div class="static-plant">${e}</div>`; }
+      if(plots.has(idx)) cell+=`<div class="plot" data-plot="1"></div>`;
+      cell+=`</div>`; tiles.push(cell);
+    }
+  }
+  const plantHtml=plants.map((p,i)=>`<div class="plant" draggable="true" ondragstart="dragPlant(event)" onclick="selectPlant(this)" data-soil="${p.soil}" data-emoji="${p.emoji}" data-name="${p.name}" data-id="p${i}">${p.emoji} ${p.name}</div>`).join('');
+  view.innerHTML = `<div class="map-wrap">
+    <div>
+      <div class="map" id="map">${tiles.join('')}</div>
+      <div class="tiny" style="margin-top:8px; font-weight:900">Legenda: 
+        <span style="background:#fde047; padding:2px 6px; border-radius:6px">Arenoso</span> • 
+        <span style="background:#94a3b8; padding:2px 6px; border-radius:6px">Rochoso</span> • 
+        <span style="background:#fb923c; padding:2px 6px; border-radius:6px">Argiloso</span> • 
+        <span style="background:#34d399; padding:2px 6px; border-radius:6px">Humoso</span>
+      </div>
+    </div>
+    <div class="card"><div class="title">Plantas</div>
+      <div class="pile" id="plantsPile" style="margin-top:10px">${plantHtml}</div>
+      <div id="hintBox" class="tiny" style="margin-top:8px; padding:8px; border-radius:12px; background:var(--card); border:2px dashed var(--line); font-weight:800">👆 Toque numa planta para ver uma dica.</div>
+    </div></div>`;
+  startTimer(); ringSet(66);
+}
+window.dragPlant = (e)=>{ dragging=e.target; e.dataTransfer && e.dataTransfer.setData && e.dataTransfer.setData('text/plain', dragging.dataset.soil); if(!dragging.dataset.emoji){ const parts=dragging.textContent.trim().split(' '); dragging.dataset.emoji = parts.shift(); dragging.dataset.name = parts.join(' ').trim(); } };
+window.dropOnTile = (e)=>{ e.preventDefault && e.preventDefault(); if(!dragging) return; tryPlaceTile(e.currentTarget, dragging.dataset.soil, dragging) };
+window.selectPlant = (el)=>{ if(selectedPlant) selectedPlant.classList.remove('selected'); selectedPlant=el; el.classList.add('selected'); const name=el.dataset.name||el.textContent.trim(); const tip = plantHint(name); const hb=document.getElementById('hintBox'); if(hb) hb.textContent = name+': '+tip; };
+window.tapTile = (tileEl)=>{ if(!selectedPlant) return toast('Selecione uma planta primeiro'); tryPlaceTile(tileEl, selectedPlant.dataset.soil, selectedPlant) };
+function tryPlaceTile(tileEl, gotSoil, plantEl){
+  const want = tileEl.dataset.solo; const plot = tileEl.querySelector('[data-plot="1"]');
+  if(!plot){ tileEl.classList.add('wrong'); setTimeout(()=>tileEl.classList.remove('wrong'),300); AudioFX.bad(); toast('Plante apenas nos canteiros vazios. Procure a borda pontilhada.', 'bad'); tupaSay('Escolha um canteiro disponível.', false); return; }
+  if(want===gotSoil){
+    const emoji = plantEl.dataset.emoji || plantEl.textContent.trim().split(' ')[0];
+    const planted = document.createElement('div'); planted.className='static-plant'; planted.textContent=emoji; plot.replaceWith(planted);
+    plantEl.classList.remove('selected'); plantEl.remove(); selectedPlant=null; dragging=null;
+    addScore(20); AudioFX.ok(); toast('Plantio perfeito! Solo adequado 👍', 'good'); tupaSay('Excelente combinação de planta e solo!', false);
+    if(document.querySelectorAll('#plantsPile .plant').length===0){ winScreen(); }
+  }else{
+    tileEl.classList.add('wrong'); setTimeout(()=>tileEl.classList.remove('wrong'),300);
+    AudioFX.bad(); toast('Essa planta prefere outro tipo de terreno. Veja a legenda e a textura.', 'bad'); tupaSay('Olhe a cor e a textura do solo.', false);
+  }
+}
+function plantHint(name){
+  const map={
+    "Mangueira":"Curte muito sol e base com boa drenagem.",
+    "Coqueiro":"Gosta de luz intensa e terreno leve (não encharca).",
+    "Mandacaru":"Tolera seca; lugares pedregosos favorecem.",
+    "Aroeira":"Vai melhor com base firme, pouca água.",
+    "Bananeira":"Aprecia umidade constante e matéria orgânica.",
+    "Ingá":"Se dá bem onde o solo segura um pouco de água.",
+    "Ipê-amarelo":"Precisa de apoio estável para enraizar bem.",
+    "Jatobá":"É pesado; precisa de base compacta e profunda.",
+    "Pitanga":"Gosta de nutrientes e umidade moderada.",
+    "Melão":"Gosta de calor e terreno leve, sem água parada."
+  };
+  return map[name] || 'Observe água, luz e firmeza do terreno.';
+}
+
+/* ===== Win ===== */
+function winScreen(){
+  tupaSay('Missão completa! Você devolveu força ao Planeta Vivo!', false);
+  AudioFX.win(); FX.burst(260); clearInterval(timerInt);
+  const time=timerEl.textContent;
+  ringSet(100);
+  view.innerHTML = `<div class=\"card\"><div class=\"title\">Missão completa! 🌍<\/div><p>Pontuação final: <b>${score}<\/b> • Tempo: <b>${time}<\/b><\/p><p class=\"tiny\" style=\"font-weight:900\">Ao plantar no solo certo, você imita o equilíbrio da natureza. 🌿<\/p>
+  <div class=\"grid cols-2\" style=\"margin-top:10px\"><button class=\"btn\" id=\"againBtn\">Jogar de novo<\/button><button class=\"btn ghost\" id=\"shareBtn\">Compartilhar<\/button><\/div><\/div>`;
+  $('#againBtn').onclick = ()=> resetGame();
+  $('#shareBtn').onclick = async () => {
+    const text = `Acertei a Missao Planeta Vivo (Solos) V3.4! Pontos: ${score} • Tempo: ${time}`;
+    try{ await navigator.share({title:'Missao Planeta Vivo', text}); } catch(e){ navigator.clipboard && navigator.clipboard.writeText && navigator.clipboard.writeText(text); toast('Copiado!') }
+  };
+}
+
+/* ===== Intro & HowTo texts ===== */
+function renderIntro(){
+  view.innerHTML=`
+    <div class="card">
+      <div class="title">🌩️ Tupã — Guardião do Céu e da Terra</div>
+      <p style="font-weight:800; font-size:1.05rem; line-height:1.35">
+        “Ouvi o chamado do planeta… 🌍<br>
+        E escolhi você, pequeno guardião!<br>
+        Vamos limpar, aprender e plantar para devolver a vida à Terra.”
+      </p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap">
+        <button class="btn" id="startIntro">Começar Missão</button>
+        <button class="btn ghost" id="howToIntro">Como jogar</button>
+      </div>
+    </div>`;
+  bindGlobalControls();
+}
+function currentHowToText(forceStage){
+  const name = forceStage || stageNameEl.textContent || 'Treino';
+  if(name.includes('Fase 1')){
+    return `<p><b>Fase 1 — Reciclagem:</b> toque ou arraste o item até a <b>lixeira correta</b>.</p>
+            <p>Dica: leia o nome do item (papel, plástico, metal, vidro, orgânico).</p>`;
+  }
+  if(name.includes('Fase 2')){
+    return `<p><b>Fase 2 — Quiz:</b> leia a frase e escolha <b>Verdadeiro</b> ou <b>Falso</b>.</p>
+            <p>Marque com atenção: nem tudo que parece certo ajuda o planeta.</p>`;
+  }
+  if(name.includes('Fase 3')){
+    return `<p><b>Fase 3 — Plantio:</b> toque na <b>planta</b> e depois no <b>canteiro</b>.</p>
+            <p>Use a <b>cor/ textura</b> do terreno e a <b>legenda</b> abaixo do mapa para decidir.</p>`;
+  }
+  return `<p>Bem-vindo! Clique em <b>Começar</b> para iniciar a missão.</p>`;
+}
+renderIntro();
+// startTimer(); // agora só começa depois do jogador apertar em Começar
+// Acessibilidade: Enter ativa botões focados
+document.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && document.activeElement && document.activeElement.click) document.activeElement.click(); });
+</script>
+
+<script>
+// === Narrador Tupã (Web Speech API) ===
+(function(){
+  const supportsSpeech = 'speechSynthesis' in window;
+  let narrationOn = false;
+  let voicePreferred = null;
+
+  function pickVoice() {
+    try{
+      const voices = speechSynthesis.getVoices();
+      // Prioriza pt-BR; depois pt-PT; senão primeira disponível
+      voicePreferred = (voices||[]).find(v => /pt-?BR/i.test(v.lang)) 
+                    || (voices||[]).find(v => /^pt/i.test(v.lang))
+                    || (voices||[])[0] || null;
+    }catch(e){ voicePreferred = null; }
+  }
+
+  if(supportsSpeech){
+    // Em alguns navegadores as vozes carregam de forma assíncrona
+    window.speechSynthesis.onvoiceschanged = pickVoice;
+    pickVoice();
+  }
+
+  function say(text){
+    if(!supportsSpeech) return;
+    try{
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(String(text||'').replace(/\s+/g,' ').trim());
+      if(voicePreferred) u.voice = voicePreferred;
+      u.lang = (voicePreferred && voicePreferred.lang) || 'pt-BR';
+      u.rate = 1;   // velocidade natural
+      u.pitch = 1;  // tom neutro
+      speechSynthesis.speak(u);
+    }catch(e){ /* silencia erros */ }
+  }
+
+  // Utilitário: remove tags HTML para leitura limpa
+  function strip(htmlStr){
+    const div = document.createElement('div'); div.innerHTML = htmlStr || '';
+    return (div.textContent || div.innerText || '').replace(/\s+/g,' ').trim();
+  }
+
+  // Acessa elementos já existentes
+  const scoreEl = document.querySelector('#score');
+  const stageNameEl = document.querySelector('#stageName');
+  const timerEl = document.querySelector('#timer');
+  const tupaBtn = document.querySelector('#tupaBtn');
+
+  // Gera um snapshot de contexto para leitura sob demanda
+  function summarizeContext(forceStageName){
+    const fase = forceStageName || (stageNameEl && stageNameEl.textContent) || 'Treino';
+    let howTo = '';
+    try{
+      if(typeof currentHowToText === 'function'){ howTo = strip(currentHowToText(fase)); }
+    }catch(e){ /* ignore */ }
+    const pontos = (scoreEl && scoreEl.textContent) ? scoreEl.textContent : '0';
+    const tempo = (timerEl && timerEl.textContent) ? timerEl.textContent : '';
+    const parts = [
+      `Fase: ${fase}.`,
+      howTo ? howTo : '',
+      `Pontos: ${pontos}.`,
+      tempo ? `Tempo: ${tempo}.` : ''
+    ].filter(Boolean);
+    return parts.join(' ');
+  }
+
+  // Hooka tupaSay para falar quando alsoNarrate = true
+  const _tupaSay = window.tupaSay;
+  window.tupaSay = function(text, alsoNarrate = true){
+    _tupaSay && _tupaSay(text, alsoNarrate);
+    if(narrationOn && alsoNarrate){ say(text); }
+  };
+
+  // Wrap setStage para narrar instruções da fase
+  const _setStage = window.setStage;
+  if(typeof _setStage === 'function'){
+    window.setStage = function(name){
+      const r = _setStage.apply(this, arguments);
+      if(narrationOn){
+        const msg = summarizeContext(name);
+        say(msg);
+      }
+      return r;
+    };
+  }
+
+  // Wrap toast (feedback curto: "Boa!", "Ops!", etc.)
+  const _toast = window.toast;
+  if(typeof _toast === 'function'){
+    window.toast = function(msg){
+      const r = _toast.apply(this, arguments);
+      if(narrationOn){ say(msg); }
+      return r;
+    };
+  }
+
+  // Wrap addScore para falar pontos atuais
+  const _addScore = window.addScore;
+  if(typeof _addScore === 'function'){
+    window.addScore = function(n){
+      const r = _addScore.apply(this, arguments);
+      try{
+        if(narrationOn && scoreEl){ say(`Pontos: ${scoreEl.textContent}`); }
+      }catch(e){}
+      return r;
+    };
+  }
+
+  // Wrap winScreen para dizer vitória
+  const _winScreen = window.winScreen;
+  if(typeof _winScreen === 'function'){
+    window.winScreen = function(){
+      const r = _winScreen.apply(this, arguments);
+      if(narrationOn){ say('Missão completa! Parabéns!'); }
+      return r;
+    };
+  }
+
+  // Torna o botão Tupã um botão de áudio: toggle narração ON/OFF e fala o contexto atual
+  if(tupaBtn){
+    tupaBtn.setAttribute('aria-label','Ativar ou desativar narração do Tupã');
+    tupaBtn.setAttribute('aria-pressed','false');
+
+    tupaBtn.addEventListener('click', ()=>{
+      narrationOn = !narrationOn;
+      tupaBtn.setAttribute('aria-pressed', narrationOn ? 'true' : 'false');
+      if(!supportsSpeech){
+        window.tupaSay && window.tupaSay('Seu navegador não tem voz disponível.', false);
+        return;
+      }
+      if(narrationOn){
+        const msg = summarizeContext();
+        say('Narração ativada. ' + msg);
+      }else{
+        say('Narração desativada.');
+      }
+    });
+  }
+})();
+</script>
+
+
+<script>
+// === Narração extra: cliques e frases dinâmicas ===
+(function(){
+  const tupaBtn = document.querySelector('#tupaBtn');
+  const hasSpeech = 'speechSynthesis' in window;
+
+  function narrationOn(){
+    return tupaBtn && tupaBtn.getAttribute('aria-pressed') === 'true';
+  }
+
+  function speakPT(text){
+    if(!hasSpeech || !text) return;
+    try{
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(String(text).replace(/\s+/g,' ').trim());
+      const voices = speechSynthesis.getVoices();
+      const v = (voices||[]).find(v => /pt-?BR/i.test(v.lang)) || (voices||[]).find(v => /^pt/i.test(v.lang)) || null;
+      if(v) u.voice = v;
+      u.lang = (v && v.lang) || 'pt-BR';
+      u.rate = 1; u.pitch = 1;
+      speechSynthesis.speak(u);
+    }catch(e){}
+  }
+
+  function getAccessibleName(el){
+    if(!el) return '';
+    // Subir pro ancestral clicável mais próximo
+    const root = el.closest('button, [role="button"], [tabindex], a, .option, .answer, .bin, .plant, .card, .tile, .item, .choice') || el;
+
+    // aria-label tem prioridade
+    let name = root.getAttribute && root.getAttribute('aria-label');
+    if(name) return name;
+
+    // usa title se existir
+    name = root.getAttribute && root.getAttribute('title');
+    if(name) return name;
+
+    // usa alt se for imagem
+    if(root.tagName === 'IMG'){
+      name = root.getAttribute('alt');
+      if(name) return name;
+    }
+
+    // fallback: texto visível
+    name = root.textContent || '';
+    name = name.replace(/\s+/g,' ').trim();
+    if(name) return name;
+
+    // Por fim, a partir da classe/id
+    if(root.id) return root.id.replace(/[-_]/g,' ');
+    if(root.className && typeof root.className === 'string'){
+      return root.className.split(' ')[0].replace(/[-_]/g,' ');
+    }
+    return '';
+  }
+
+  // Narra cliques (captura) com mínimo de ruído
+  document.addEventListener('click', function(e){
+    if(!narrationOn()) return;
+    // não repetir quando o clique é no próprio tupaBtn (o outro script já fala)
+    if(e.target && tupaBtn && (e.target === tupaBtn || tupaBtn.contains(e.target))) return;
+
+    const name = getAccessibleName(e.target);
+    if(!name) return;
+
+    // Mensagem curta e objetiva
+    speakPT('Selecionado: ' + name + '.');
+  }, true);
+
+  // Narra frases/instruções que mudam dinamicamente
+  const phraseSelectors = [
+    '#howto', '.howto', '#phrase', '.phrase', '.dialog', '#dialog', '#message', '.message',
+    '#stageHowto', '#instructions', '.instructions', '#question', '.question', '.toast'
+  ];
+
+  // Debounce simples para evitar repetição
+  let lastSpoken = '';
+  let debounceTimer = null;
+  function speakUnique(text){
+    const clean = (text||'').replace(/\s+/g,' ').trim();
+    if(!clean || clean === lastSpoken) return;
+    lastSpoken = clean;
+    speakPT(clean);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(()=>{ lastSpoken = ''; }, 2000);
+  }
+
+  // Observa mudanças de texto e de nós filhos
+  const observer = new MutationObserver((muts)=>{
+    if(!narrationOn()) return;
+    for(const m of muts){
+      if(m.type === 'childList' || m.type === 'characterData'){
+        for(const sel of phraseSelectors){
+          const el = (m.target.nodeType === 1 ? m.target : m.target.parentElement);
+          if(!el) continue;
+          if(el.matches && el.matches(sel)){ speakUnique(el.textContent); break; }
+          const found = el.querySelector && el.querySelector(sel);
+          if(found){ speakUnique(found.textContent); break; }
+        }
+      }
+    }
+  });
+
+  observer.observe(document.documentElement, { subtree: true, childList: true, characterData: true });
+
+  // Fala imediatamente se já existir alguma instrução na tela ao ativar a narração (o outro script já lê contexto; aqui reforçamos frases específicas)
+  function readInitial(){
+    if(!narrationOn()) return;
+    for(const sel of phraseSelectors){
+      const el = document.querySelector(sel);
+      if(el && el.textContent){ speakUnique(el.textContent); break; }
+    }
+  }
+
+  // Quando o estado do botão muda, tentar ler a frase corrente
+  const btnObserver = new MutationObserver(()=>{ readInitial(); });
+  if(tupaBtn){
+    btnObserver.observe(tupaBtn, { attributes: true, attributeFilter: ['aria-pressed'] });
+  }
+
+  // Segurança: se Speech não existir, não faz nada (silencioso)
+})();
+</script>
+
+
+<!-- Ajuste suave da progressão do anel, sem alterar a interface -->
+<script>
+(function(){
+  // Garante que só rode depois que tudo existir
+  function setupProgressOverride(){
+    try {
+      if (typeof window.ringSet !== 'function' || typeof window.addScore !== 'function') return;
+
+      var originalRingSet = window.ringSet;
+      var originalAddScore = window.addScore;
+      var originalResetGame = typeof window.resetGame === 'function' ? window.resetGame : null;
+
+      var missionProgress = 0;
+      var started = false;
+
+      // Sobrescreve ringSet para não pular para 33/66/90 automaticamente
+      window.ringSet = function(p){
+        // Antes do primeiro acerto, mantém em 0%
+        if (!started) {
+          originalRingSet(0);
+          return;
+        }
+        // Depois, usa apenas o progresso acumulado
+        originalRingSet(missionProgress);
+      };
+
+      // Faz o progresso subir devagar a cada pontuação positiva
+      window.addScore = function(n){
+        originalAddScore(n);
+        if (n > 0) {
+          started = true;
+          missionProgress = Math.max(0, Math.min(100, missionProgress + 3)); // ~3% por acerto
+          originalRingSet(missionProgress);
+        }
+      };
+
+      if (originalResetGame){
+        window.resetGame = function(){
+          originalResetGame();
+          missionProgress = 0;
+          started = false;
+          originalRingSet(0);
+        };
+      }
+    } catch(e){
+      console && console.warn && console.warn('override progress error', e);
+    }
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive'){
+    setupProgressOverride();
+  } else {
+    document.addEventListener('DOMContentLoaded', setupProgressOverride);
+  }
+})();
+</script>
+
+</body>
+</html>
